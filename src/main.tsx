@@ -1,2 +1,5 @@
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-createRoot(document.getElementById('root')!).render(<h1>단청 생성기</h1>);
+import App from './App';
+
+createRoot(document.getElementById('root')!).render(<StrictMode><App /></StrictMode>);

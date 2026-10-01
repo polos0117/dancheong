@@ -38,7 +38,19 @@ function beam(d: Design, style: Style): { groups: Group[]; labels: Label[] } {
 
 const moved = (labels: Label[], k: number, dx: number, dy: number) => labels.map(l => ({ ...l, x: l.x * k + dx, y: l.y * k + dy }));
 
-export function compose(d: Design, style: Style, ratio: Ratio): Scene {
+// 이름표는 가운데 정렬로 그림 위에 얹힌다 — 가장자리 가까운 것은 안쪽으로 당겨 잘리지 않게
+const inside = (scene: Scene): Scene => ({
+  ...scene,
+  labels: scene.labels.map(l => ({
+    ...l,
+    x: Math.min(scene.w * 0.88, Math.max(scene.w * 0.12, l.x)),
+    y: Math.min(scene.h * 0.89, Math.max(scene.h * 0.11, l.y)),
+  })),
+});
+
+export const compose = (d: Design, style: Style, ratio: Ratio): Scene => inside(layout(d, style, ratio));
+
+function layout(d: Design, style: Style, ratio: Ratio): Scene {
   const { w, h } = SIZE[ratio];
   if (ratio === 'beam') return { w, h, ...beam(d, style) };
   if (ratio === 'square') return { w, h, groups: [{ shapes: squareMeoricho(d).shapes }], labels: squareMeoricho(d).labels };

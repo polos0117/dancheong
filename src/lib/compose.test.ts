@@ -41,6 +41,18 @@ describe('compose', () => {
     }
   });
 
+  it('이름표는 가장자리에서 떨어져 있다 — 가운데 정렬한 이름표가 그림 밖으로 잘리지 않게', () => {
+    for (const style of STYLES) for (const ratio of RATIOS) for (const seed of [0, 1, 4821, 99999]) {
+      const scene = compose(designOf(seed), style, ratio);
+      for (const l of scene.labels) {
+        expect(l.x).toBeGreaterThanOrEqual(scene.w * 0.12 - 1e-9);
+        expect(l.x).toBeLessThanOrEqual(scene.w * 0.88 + 1e-9);
+        expect(l.y).toBeGreaterThanOrEqual(scene.h * 0.11 - 1e-9);
+        expect(l.y).toBeLessThanOrEqual(scene.h * 0.89 + 1e-9);
+      }
+    }
+  });
+
   it('내보내기 크기는 비율과 같은 모양', () => {
     for (const r of RATIOS) expect(EXPORT_PX[r].w / EXPORT_PX[r].h).toBeCloseTo(SIZE[r].w / SIZE[r].h, 2);
   });

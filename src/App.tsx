@@ -17,7 +17,9 @@ export default function App() {
   const [note, setNote] = useState('');
   const set = (patch: Partial<State>) => setState(s => ({ ...s, ...patch }));
 
-  useEffect(() => { history.replaceState(null, '', toQuery(state)); }, [state]);
+  // Safari·Firefox 는 replaceState 를 너무 자주 부르면 오류를 던진다(씨앗 칸에서 ↑ 키를 누르고 있을 때 등).
+  // 주소 갱신은 덤이라 실패해도 그림은 그대로 둔다
+  useEffect(() => { try { history.replaceState(null, '', toQuery(state)); } catch { /* 다음 변경 때 다시 */ } }, [state]);
   useEffect(() => {
     if (!note) return;
     const t = setTimeout(() => setNote(''), 3000);
@@ -77,7 +79,7 @@ export default function App() {
           <button type="button" className="primary" onClick={() => set({ seed: randomSeed() })}>새로 만들기</button>
           <label className="field">씨앗
             <input type="number" min={0} max={SEED_MAX} value={state.seed} inputMode="numeric"
-              onChange={e => { const v = Number(e.target.value); if (Number.isInteger(v) && v >= 0 && v <= SEED_MAX) set({ seed: v }); }} />
+              onChange={e => { if (e.target.value === '') return; /* 지우는 중 — Number('') 는 0 이라 씨앗 0 으로 바뀌지 않게 */ const v = Number(e.target.value); if (Number.isInteger(v) && v >= 0 && v <= SEED_MAX) set({ seed: v }); }} />
           </label>
         </div>
         <div className="row" role="group" aria-label="양식">
